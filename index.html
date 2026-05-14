@@ -129,7 +129,7 @@ body {
   background: var(--white);
   border-radius: var(--r-2xl);
   width: 1040px;
-  height: 764px;
+  height: 700px;
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-lg);
@@ -168,14 +168,16 @@ body {
 
 /* ── Filter Bar ── */
 .filter-bar {
-  padding: 12px 24px;
+  padding: 10px 20px;
   background: var(--gray-50);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 .filter-row-top {
-  display: flex; align-items: flex-end; gap: 10px;
+  display: flex; align-items: flex-end; gap: 8px; flex-wrap: nowrap;
 }
+.filter-row-top .filter-group { min-width: 0; flex: 1; }
+.filter-row-top .filter-group.no-grow { flex: 0 0 auto; }
 .filter-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
 .filter-group.no-grow { flex: 0 0 auto; }
 
@@ -185,12 +187,12 @@ body {
 }
 
 .filter-select {
-  font-family: var(--font); font-size: 13px; color: var(--gray-800);
+  font-family: var(--font); font-size: 12px; color: var(--gray-800);
   background: var(--white); border: 1px solid var(--border);
-  border-radius: var(--r-sm); padding: 7px 28px 7px 10px;
+  border-radius: var(--r-sm); padding: 6px 22px 6px 8px;
   cursor: pointer; appearance: none; width: 100%;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239E9C94' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 8px center;
+  background-repeat: no-repeat; background-position: right 6px center;
   transition: border-color var(--transition), box-shadow var(--transition);
   min-width: 0;
 }
@@ -243,6 +245,44 @@ body {
 }
 .search-box:focus-within .search-db-badge,
 .search-box:hover .search-db-badge { opacity: 1; }
+
+/* ── 태그 필터 행 ── */
+.tag-filter-row {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 10px; min-width: 0;
+}
+.tag-filter-label {
+  font-size: 11px; font-weight: 600; color: var(--gray-500);
+  white-space: nowrap; flex-shrink: 0;
+}
+.tag-scroll-btn {
+  flex-shrink: 0; background: none; border: none; cursor: pointer;
+  color: var(--gray-400); padding: 2px 3px; line-height: 1;
+  display: flex; align-items: center;
+  transition: color var(--transition);
+}
+.tag-scroll-btn:hover { color: var(--teal); }
+.tag-filter-track {
+  display: flex; gap: 6px; overflow-x: auto; overflow-y: hidden;
+  flex: 1; min-width: 0;
+  scrollbar-width: none;
+}
+.tag-filter-track::-webkit-scrollbar { display: none; }
+.tag-chip {
+  font-family: var(--font); font-size: 11px; font-weight: 500;
+  color: var(--gray-600); background: var(--white);
+  border: 1px solid var(--border-md); border-radius: 20px;
+  padding: 3px 11px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  transition: all var(--transition);
+  display: flex; align-items: center; gap: 4px;
+}
+.tag-chip::before { content: '✓'; font-size: 10px; opacity: 0; width: 0; overflow: hidden; transition: all 0.12s; }
+.tag-chip:hover { border-color: var(--teal-mid); color: var(--teal-dark); }
+.tag-chip.active {
+  background: var(--teal-light); border-color: var(--teal);
+  color: var(--teal-dark); font-weight: 600;
+}
+.tag-chip.active::before { opacity: 1; width: 10px; }
 
 /* view toggle */
 .view-toggle {
@@ -517,10 +557,11 @@ body {
 .nav-info { font-size: 11px; color: var(--gray-400); min-width: 40px; text-align: center; }
 .preview-body { padding: 16px 20px; }
 .preview-q-area {
-  background: var(--gray-50); border: 1px solid var(--border);
+  background: #E8F4FB; border: 1px solid var(--border);
   border-radius: var(--r-md); overflow: hidden; margin-bottom: 12px;
+  height: 260px;
 }
-.preview-q-area svg { width: 100%; height: 260px; display: block; }
+.preview-q-area svg { width: 100%; height: 260px; display: none; }
 .preview-source {
   font-size: 12px; color: var(--gray-400); margin-bottom: 10px;
 }
@@ -813,7 +854,7 @@ body {
       <!-- filter bar -->
       <div class="filter-bar" style="position:relative">
         <div class="filter-row-top">
-          <div class="filter-group">
+          <div class="filter-group" style="flex: 0 0 120px;">
             <span class="filter-field-label">학교급</span>
             <select class="filter-select" id="f-school" onchange="onFilterChange()">
               <option value="">전체</option>
@@ -822,7 +863,7 @@ body {
               <option value="고등학교">고등학교</option>
             </select>
           </div>
-          <div class="filter-group">
+          <div class="filter-group" style="flex: 0 0 140px;">
             <span class="filter-field-label">영역구분</span>
             <select class="filter-select" id="f-area" onchange="onFilterChange()">
               <option value="">전체</option>
@@ -834,30 +875,10 @@ body {
               <option value="기타">기타</option>
             </select>
           </div>
-          <div class="filter-group">
-            <span class="filter-field-label">학년</span>
-            <select class="filter-select" id="f-grade" onchange="onFilterChange()">
-              <option value="">전체</option>
-              <option value="1">1학년</option>
-              <option value="2">2학년</option>
-              <option value="3">3학년</option>
-              <option value="4">4학년</option>
-              <option value="5">5학년</option>
-              <option value="6">6학년</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <span class="filter-field-label">교과과정(단원명)</span>
-            <select class="filter-select" id="f-unit" onchange="onFilterChange()">
-              <option value="">전체</option>
-              <option value="1.삼각형의 작도">1.삼각형의 작도</option>
-              <option value="2.삼각형의 합동">2.삼각형의 합동</option>
-              <option value="3.평행선과 각">3.평행선과 각</option>
-              <option value="4.사각형의 성질">4.사각형의 성질</option>
-              <option value="5.원과 부채꼴">5.원과 부채꼴</option>
-            </select>
-          </div>
-          <div class="filter-group no-grow">
+
+          <div class="filter-spacer"></div>
+
+          <div class="filter-group no-grow" style="flex: 0 0 300px;">
             <span class="filter-field-label">검색</span>
             <div class="search-box" style="position:relative">
               <svg class="search-icon" width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="9" r="6"/><line x1="13.5" y1="13.5" x2="18" y2="18"/></svg>
@@ -867,8 +888,32 @@ body {
           </div>
         </div>
 
+        <!-- 태그 필터 행 -->
+        <div class="tag-filter-row">
+          <span class="tag-filter-label">태그</span>
+          <button class="tag-scroll-btn" onclick="scrollTags(-1)">
+            <svg width="6" height="10" viewBox="0 0 6 10" fill="none"><polyline points="5,1 1,5 5,9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="tag-filter-track" id="tagTrack">
+            <button class="tag-chip active" data-tag="" onclick="selectTag(this, '')">전체</button>
+            <button class="tag-chip" data-tag="공간좌표(3D)" onclick="selectTag(this, '공간좌표(3D)')">공간좌표(3D)</button>
+            <button class="tag-chip" data-tag="그림그래프" onclick="selectTag(this, '그림그래프')">그림그래프</button>
+            <button class="tag-chip" data-tag="꺾은선그래프" onclick="selectTag(this, '꺾은선그래프')">꺾은선그래프</button>
+            <button class="tag-chip" data-tag="다각형" onclick="selectTag(this, '다각형')">다각형</button>
+            <button class="tag-chip" data-tag="다면체(3D)" onclick="selectTag(this, '다면체(3D)')">다면체(3D)</button>
+            <button class="tag-chip" data-tag="대수 막대" onclick="selectTag(this, '대수 막대')">대수 막대</button>
+            <button class="tag-chip" data-tag="대수 블록" onclick="selectTag(this, '대수 블록')">대수 블록</button>
+            <button class="tag-chip" data-tag="도미노" onclick="selectTag(this, '도미노')">도미노</button>
+            <button class="tag-chip" data-tag="도수분포다각형" onclick="selectTag(this, '도수분포다각형')">도수분포다각형</button>
+            <button class="tag-chip" data-tag="도수분포표" onclick="selectTag(this, '도수분포표')">도수분포표</button>
+            <button class="tag-chip" data-tag="도형판" onclick="selectTag(this, '도형판')">도형판</button>
+          </div>
+          <button class="tag-scroll-btn" onclick="scrollTags(1)">
+            <svg width="6" height="10" viewBox="0 0 6 10" fill="none"><polyline points="1,1 5,5 1,9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
 
-      <!-- body -->
+      </div><!-- /.filter-bar -->
       <div class="modal-body">
         <div class="q-grid-wrap">
           <div class="q-grid" id="qGrid"></div>
@@ -906,6 +951,10 @@ body {
         </div>
         <div class="preview-body">
           <div class="preview-q-area" id="pvImg"></div>
+          <div class="meta-grid">
+            <div class="meta-cell"><div class="lbl">영역</div><div class="val" id="pvUnit">—</div></div>
+          </div>
+          <div class="preview-tags" id="pvTags"></div>
         </div>
         <div class="preview-footer">
           <label class="preview-check-row" onclick="toggleFromPv()">
@@ -1058,19 +1107,30 @@ let filteredQ = [...ALL_Q];
 const selected = new Set();
 let pvIdx = 0;
 let currentView = 'grid';
+let activeTag = '';
+
+/* ── TAG FILTER ── */
+function selectTag(el, tag) {
+  activeTag = tag;
+  document.querySelectorAll('.tag-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  onFilterChange();
+}
+
+function scrollTags(dir) {
+  const track = document.getElementById('tagTrack');
+  track.scrollBy({ left: dir * 120, behavior: 'smooth' });
+}
 
 /* ── FILTER ── */
 function onFilterChange() {
-  const cv = document.getElementById('f-curriculum').value;
+  const cv = document.getElementById('f-curriculum') ? document.getElementById('f-curriculum').value : '';
   const sv = document.getElementById('f-school').value;
-  const gv = document.getElementById('f-grade').value;
-  const uv = document.getElementById('f-unit').value;
   const kw = document.querySelector('.search-input').value.toLowerCase().trim();
   filteredQ = ALL_Q.filter(q => {
     if(cv && q.curriculum !== cv) return false;
     if(sv && q.school !== sv) return false;
-    if(gv && q.grade !== gv) return false;
-    if(uv && q.unit !== uv) return false;
+    if(activeTag && !q.tags.includes(activeTag)) return false;
     if(kw && !q.title.includes(kw) && !q.tags.join(' ').toLowerCase().includes(kw) && !q.unit.toLowerCase().includes(kw)) return false;
     return true;
   });
@@ -1079,7 +1139,7 @@ function onFilterChange() {
 }
 
 function resetFilters() {
-  ['f-curriculum','f-school','f-grade','f-unit'].forEach(id => document.getElementById(id).value = '');
+  ['f-curriculum','f-school'].forEach(id => document.getElementById(id) && (document.getElementById(id).value = ''));
   document.querySelector('.search-input').value = '';
   onFilterChange();
 }
@@ -1188,7 +1248,6 @@ function renderPv() {
   const q = filteredQ[pvIdx];
   if(!q) return;
   document.getElementById('pvTitle').textContent = q.title;
-  document.getElementById('pvSource').textContent = q.meta;
   document.getElementById('pvUnit').textContent = q.unit;
   document.getElementById('pvTags').innerHTML = q.tags.map(t=>`<span class="tag" style="font-size:11px">#${t}</span>`).join('');
   document.getElementById('pvImg').innerHTML = `<svg viewBox="0 0 160 120"><use href="#${q.svgId}"/></svg>`;
